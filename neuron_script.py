@@ -2,13 +2,13 @@ import catmaid # pretty stupid name
 import json
 import os
 
-
-base_dir = "/home/simulation/tracing"
+sep = os.sep
+base_dir = "Z:"+ sep + "Data" + sep + "simulation" + sep + "tracing"
 skeleton_dir = os.path.join(base_dir, 'skeletons')
 
 # Make our base directory
 if not os.path.exists(base_dir):
-    os.mkdir(base_dir)
+    os.makedirs(base_dir)
 
 # Make a directory for our skeletons, nested one deep in our base directory.
 # We'll be saving individual skeletons as JSON files here.

@@ -15,7 +15,7 @@ else:
 #c = catmaid.connect()
 c = catmaid.connect('http://catmaid2.hms.harvard.edu',  # server
                                   'wtobin',  # username
-                                  'Garesche1862',  # password
+                                  '',  # password
                                   'wfly1')  # project_id)
 
 nids = c.neuron_ids()
