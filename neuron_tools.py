@@ -1,4 +1,3 @@
-__author__ = 'asa'
 
 import connect
 import csv
