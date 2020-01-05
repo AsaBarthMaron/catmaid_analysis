@@ -4,13 +4,13 @@ import numpy as np
 import bargraph
 import stacked
 
-db_connection = connect.Connection()
+DB_CONNECTION = connect.Connection()
 print "Fetching adjacency matrix"
-adj = dict()
-adj['matrix'], adj['sk_ids'] = db_connection.con.adjacency_matrix()
-adj['matrix'] = np.array(adj['matrix'], int)
-name_to_sid = neuron_tools.name_to_sid_map(db_connection)
-sid_to_name = neuron_tools.sid_to_name_map(db_connection)
+ADJ = dict()
+ADJ['matrix'], ADJ['sk_ids'] = DB_CONNECTION.con.adjacency_matrix()
+ADJ['matrix'] = np.array(ADJ['matrix'], int)
+NAME_TO_SID = neuron_tools.name_to_sid_map(DB_CONNECTION)
+SID_TO_NAME = neuron_tools.sid_to_name_map(DB_CONNECTION)
 print "Initialization complete"
 
 
@@ -20,12 +20,12 @@ class Neuron(object):
     """
     def __init__(self, sid):
         self.sid = sid
-        self.adj_index = adj['sk_ids'].index(self.sid)
-        pre_slice = adj['matrix'][:, self.adj_index]
-        post_slice = adj['matrix'][self.adj_index, :]
+        self.adj_index = ADJ['sk_ids'].index(self.sid)
+        pre_slice = ADJ['matrix'][:, self.adj_index]
+        post_slice = ADJ['matrix'][self.adj_index, :]
         self.contacts = dict()
-        self.contacts['pre'] = self.get_contacts(pre_slice, adj['sk_ids'], post_slice)
-        self.contacts['post'] = self.get_contacts(post_slice, adj['sk_ids'], pre_slice)
+        self.contacts['pre'] = self.get_contacts(pre_slice, ADJ['sk_ids'], post_slice)
+        self.contacts['post'] = self.get_contacts(post_slice, ADJ['sk_ids'], pre_slice)
         self.get_contact_types()
         self.total_contacts = {'pre': dict(), 'post': dict()}
         self.get_mean_contacts('pre')
@@ -40,13 +40,13 @@ class Neuron(object):
             contact_ind = (adj_slice > 1).nonzero()[0]
 
         contacts = [sk_ids[i] for i in contact_ind]
-        contacts = [sid_to_name[sid] for sid in contacts]
+        contacts = [SID_TO_NAME[sid] for sid in contacts]
         contacts = dict(zip(contacts, [adj_slice[i] for i in contact_ind]))
         return contacts
 
     def get_contact_types(self):
-        self.contacts['pre'] = neuron_tools.get_types_of_neurons(self.contacts['pre'], db_connection)
-        self.contacts['post'] = neuron_tools.get_types_of_neurons(self.contacts['post'], db_connection)
+        self.contacts['pre'] = neuron_tools.get_types_of_neurons(self.contacts['pre'], DB_CONNECTION)
+        self.contacts['post'] = neuron_tools.get_types_of_neurons(self.contacts['post'], DB_CONNECTION)
 
     def get_mean_contacts(self, io):
         for key, value in self.contacts[io].iteritems():
@@ -105,11 +105,11 @@ class Population(object):
     def __init__(self, annotation):
         """"Gets Neuron objects for all neurons of a particular annotation"""
         self.type = annotation
-        self.nnames = neuron_tools.get_neurons_of_type(annotation, db_connection)
+        self.nnames = neuron_tools.get_neurons_of_type(annotation, DB_CONNECTION)
         self.neurons = dict()
         print "Fetching neurons"
         for nname in self.nnames:
-            self.neurons[nname] = Neuron(name_to_sid[nname])
+            self.neurons[nname] = Neuron(NAME_TO_SID[nname])
         print "Neurons fetched: %s" % self.nnames
 
     # def get_subset_contacts(self, subset):
